@@ -1,5 +1,7 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Appointment } from "src/appointments/entities/appointment.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
+@Entity({name:'products'})
 export class Product {
     @PrimaryGeneratedColumn()
     product_id: number
@@ -24,6 +26,10 @@ export class Product {
 
     @Column()
     stock: number;
+
+    @ManyToMany(()=> Appointment, appointment => appointment.products_id)
+    @JoinColumn()
+    appointments: Appointment[];
 
     @CreateDateColumn()
     created_at: Date;

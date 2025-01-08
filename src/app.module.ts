@@ -9,8 +9,6 @@ import { ProductsModule } from './products/products.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ServicesModule } from './services/services.module';
 import { AppointmentsModule } from './appointments/appointments.module';
-import { User } from './users/entities/user.entity';
-
 
 @Module({
   imports: [
@@ -28,18 +26,12 @@ import { User } from './users/entities/user.entity';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      /* host: process.env.DATABASE_HOST,
-      port: 5432,
-      username: process.env.DATABASE_USER,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME,
-      autoLoadEntities: true, */
+      autoLoadEntities: true,
       synchronize: true,
       ssl: {
         rejectUnauthorized: false,
       }
     }),
-    
   ],
 })
 export class AppModule {}

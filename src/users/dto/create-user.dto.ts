@@ -3,20 +3,19 @@ import { IsEmail, IsString } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty()
+  @IsString()
+  name: string;
 
-    @IsString()
-    name: string;
   @ApiProperty()
+  @IsString()
+  password: string;
 
-    @IsString()
-    password: string;
   @ApiProperty()
-
-    @IsString()
-    @IsEmail()
-    email: string;
+  @IsString()
+  @IsEmail()
+  email: string;
+  
   @ApiProperty()
-
-    @IsString()
-    rol: string
+  @IsString()
+  rol: string;
 }
