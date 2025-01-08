@@ -24,7 +24,7 @@ export class Appointment {
     user_id: User;
 
     @ManyToOne(() => Vehicle, vehicle => vehicle.appointments)
-    @JoinColumn({ name: 'vehicle_id' })
+    @JoinColumn()
     vehicle_id: Vehicle;
 
     @ManyToMany(()=> Service, service => service.appointments)
