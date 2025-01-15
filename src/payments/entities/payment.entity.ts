@@ -17,11 +17,11 @@ export class Payment {
     date: Date;
 
     @ManyToOne(() => User, user => user.payments)
-    @JoinColumn()
+    @JoinColumn({ name: 'user_id' })
     user_id: User;
 
-    @ManyToOne(()=> Appointment, appointment => appointment.payments)
-    @JoinColumn()
+    @ManyToOne(() => Appointment, appointment => appointment.payments)
+    @JoinColumn({ name: 'appointment_id' })
     appointment_id: Appointment;
 
     @CreateDateColumn()

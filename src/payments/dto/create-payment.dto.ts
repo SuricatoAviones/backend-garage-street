@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsDate, IsNumber, IsString } from "class-validator";
+import { IsDate, IsNumber, IsObject, IsString } from "class-validator";
 import { Appointment } from "src/appointments/entities/appointment.entity";
 import { User } from "src/users/entities/user.entity";
 
@@ -18,11 +18,12 @@ export class CreatePaymentDto {
     date: Date;
 
     @ApiProperty()
-    @Type(()=> User)
+    @IsObject()
+    @Type(() => User)
     user_id: User;
 
     @ApiProperty()
-    @Type(()=> Appointment)
+    @IsObject()
+    @Type(() => Appointment)
     appointment_id: Appointment;
-
 }

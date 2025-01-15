@@ -5,6 +5,7 @@ export class ResponseUserDto {
     name: string;
     password: string;
     email: string;
+    phone: string
     rol: string;
     createdAt: Date;
     updatedAt: Date;
@@ -13,6 +14,7 @@ export class ResponseUserDto {
         this.name = user.name;
         this.password = user.password;
         this.email = user.email;
+        this.phone = user.phone;
         this.rol = user.rol;
         this.createdAt = user.created_at;
         this.updatedAt = user.updated_at;

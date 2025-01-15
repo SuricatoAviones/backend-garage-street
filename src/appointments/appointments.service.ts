@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Appointment } from './entities/appointment.entity';
 import { ResponseAppointmentDto } from './dto/response-appointment.dto';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AppointmentsService {
@@ -13,23 +14,27 @@ export class AppointmentsService {
     private appointmentRepository: Repository<Appointment>,
   ) {}
 
-  async create(createAppointmentDto: CreateAppointmentDto) {
+  private readonly logger = new Logger(AppointmentsService.name);
+
+  async create(createAppointmentDto: CreateAppointmentDto): Promise<ResponseAppointmentDto> {
+    this.logger.debug('Creating appointment with DTO:', createAppointmentDto);
     try {
       const appointment = this.appointmentRepository.create(createAppointmentDto);
-      return new ResponseAppointmentDto(
-        await this.appointmentRepository.save(appointment),
-      );
+      const savedAppointment = await this.appointmentRepository.save(appointment);
+      this.logger.debug('Saved appointment:', savedAppointment);
+      return new ResponseAppointmentDto(savedAppointment);
     } catch (error) {
-      throw new BadRequestException(error);
+      this.logger.error('Error creating appointment:', error);
+      throw new BadRequestException(error.message);
     }
   }
 
   async findAll() {
     try {
-      const data = await this.appointmentRepository.find();
+      const data = await this.appointmentRepository.find({ relations: ['user_id', 'vehicle_id', 'services_id', 'products_id'] });
       return data.map((appointment) => new ResponseAppointmentDto(appointment));
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -37,13 +42,14 @@ export class AppointmentsService {
     try {
       const appointment = await this.appointmentRepository.findOne({
         where: { appointment_id },
+        relations: ['user_id', 'vehicle_id', 'services_id', 'products_id'],
       });
       if (!appointment) {
         throw new BadRequestException('Appointment not found');
       }
-      return new ResponseAppointmentDto(appointment); // Added return statement
+      return new ResponseAppointmentDto(appointment);
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -64,19 +70,19 @@ export class AppointmentsService {
           products_id: updateAppointmentDto.products_id,
         },
       );
-      return this.findOne(appointment_id); // Fixed to return the updated appointment
+      return this.findOne(appointment_id);
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException(error.message);
     }
   }
 
   async remove(appointment_id: number): Promise<ResponseAppointmentDto> {
     try {
-      const appointment = this.findOne(appointment_id); // Fixed to await the result
+      const appointment = await this.findOne(appointment_id);
       await this.appointmentRepository.delete(appointment_id);
       return appointment;
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new BadRequestException(error.message);
     }
   }
 }

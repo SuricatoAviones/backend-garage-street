@@ -3,7 +3,7 @@ import { Product } from "src/products/entities/product.entity";
 import { Service } from "src/services/entities/service.entity";
 import { User } from "src/users/entities/user.entity";
 import { Vehicle } from "src/vehicles/entities/vehicle.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany } from "typeorm";
 
 @Entity({name:'appointments'})
 export class Appointment {
@@ -19,23 +19,31 @@ export class Appointment {
     @Column()
     status: string;
 
-    @ManyToOne(() => User, user => user.appointments)
-    @JoinColumn()
+    @ManyToOne(() => User, user => user.appointments, { eager: true })
+    @JoinColumn({ name: 'user_id' })
     user_id: User;
 
-    @ManyToOne(() => Vehicle, vehicle => vehicle.appointments)
-    @JoinColumn()
+    @ManyToOne(() => Vehicle, vehicle => vehicle.appointments, { eager: true })
+    @JoinColumn({ name: 'vehicle_id' })
     vehicle_id: Vehicle;
 
-    @ManyToMany(()=> Service, service => service.appointments)
-    @JoinColumn()
+    @ManyToMany(() => Service, service => service.appointments, { eager: true })
+    @JoinTable({
+        name: 'appointment_services',
+        joinColumn: { name: 'appointment_id', referencedColumnName: 'appointment_id' },
+        inverseJoinColumn: { name: 'service_id', referencedColumnName: 'service_id' }
+    })
     services_id: Service[];
 
-    @ManyToMany(()=> Product, product => product.appointments)
-    @JoinColumn()
+    @ManyToMany(() => Product, product => product.appointments, { eager: true })
+    @JoinTable({
+        name: 'appointment_products',
+        joinColumn: { name: 'appointment_id', referencedColumnName: 'appointment_id' },
+        inverseJoinColumn: { name: 'product_id', referencedColumnName: 'product_id' }
+    })
     products_id: Product[];
 
-    @OneToMany(()=> Payment, payment => payment.appointment_id)
+    @OneToMany(() => Payment, payment => payment.appointment_id)
     @JoinColumn()
     payments: Payment[];
 
@@ -44,5 +52,4 @@ export class Appointment {
 
     @UpdateDateColumn()
     updated_at: Date;
-
 }

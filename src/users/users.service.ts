@@ -28,6 +28,7 @@ export class UsersService {
         name: createUserDto.name,
         password: await bcryptjs.hash(createUserDto.password, 10),
         email: createUserDto.email,
+        phone: createUserDto.phone,
         rol: createUserDto.rol,
       });
       return new ResponseUserDto(await this.userReporsitory.save(user));
@@ -79,6 +80,7 @@ export class UsersService {
         name: updateUserDto.name,
         password: updateUserDto.password,
         email: updateUserDto.email,
+        phone: updateUserDto.phone,
         rol: updateUserDto.rol,
       })
       return this.findOne(user_id);

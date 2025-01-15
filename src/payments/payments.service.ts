@@ -25,7 +25,7 @@ export class PaymentsService {
 
   async findAll() {
     try {
-      const data = await this.paymentRepository.find();
+      const data = await this.paymentRepository.find({ relations: ['user_id', 'appointment_id'] });
       return data.map((payment) => new ResponsePaymentDto(payment));
     }
     catch (error) {
@@ -37,6 +37,7 @@ export class PaymentsService {
     try {
       const payment = await this.paymentRepository.findOne({
         where: { payment_id },
+        relations: ['user_id', 'appointment_id'],
       });
       if (!payment) {
         throw new BadRequestException('Payment not found');
@@ -49,7 +50,7 @@ export class PaymentsService {
 
   async update(payment_id: number, updatePaymentDto: UpdatePaymentDto) {
     try {
-      const payment = await this.paymentRepository.update(payment_id,{
+      await this.paymentRepository.update(payment_id,{
         amount: updatePaymentDto.amount,
         date: updatePaymentDto.date,
         reference: updatePaymentDto.reference,
@@ -64,7 +65,7 @@ export class PaymentsService {
 
   async remove(payment_id: number) : Promise <ResponsePaymentDto> {
     try {
-      const payment = this.findOne(payment_id);
+      const payment = await this.findOne(payment_id);
       await this.paymentRepository.delete(payment_id);
       return payment;
     } catch (error) {

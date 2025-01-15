@@ -29,6 +29,9 @@ export class User {
   @Column()
   email: string;
 
+  @Column()
+  phone: string;
+
 
   @Column({ default: Roles.Rol_Trabajador })
   rol: string;
