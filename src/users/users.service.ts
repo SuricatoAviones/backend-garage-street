@@ -78,7 +78,7 @@ export class UsersService {
     try {
       const user = await this.userReporsitory.update(user_id, {
         name: updateUserDto.name,
-        password: updateUserDto.password,
+        password: await bcryptjs.hash(updateUserDto.password, 10),
         email: updateUserDto.email,
         phone: updateUserDto.phone,
         rol: updateUserDto.rol,
