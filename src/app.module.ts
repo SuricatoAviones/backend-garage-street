@@ -9,6 +9,7 @@ import { ProductsModule } from './products/products.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ServicesModule } from './services/services.module';
 import { AppointmentsModule } from './appointments/appointments.module';
+import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AppointmentsModule } from './appointments/appointments.module';
         rejectUnauthorized: false,
       }
     }),
+    PaymentMethodsModule,
   ],
 })
 export class AppModule {}

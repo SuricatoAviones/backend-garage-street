@@ -7,6 +7,7 @@ export class ResponseUserDto {
     email: string;
     phone: string
     rol: string;
+    profilePicture: string;
     createdAt: Date;
     updatedAt: Date;
     constructor(user: User) {
@@ -16,6 +17,7 @@ export class ResponseUserDto {
         this.email = user.email;
         this.phone = user.phone;
         this.rol = user.rol;
+        this.profilePicture = user.profilePicture;
         this.createdAt = user.created_at;
         this.updatedAt = user.updated_at;
     }
