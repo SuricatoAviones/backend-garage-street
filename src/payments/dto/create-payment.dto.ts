@@ -30,6 +30,6 @@ export class CreatePaymentDto {
 
     @ApiProperty()
     @IsObject()
-    @Type(() => PaymentMethod) // Añade el campo payment_method_id
+    @Type(() => PaymentMethod) 
     payment_method_id: PaymentMethod;
 }

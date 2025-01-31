@@ -11,7 +11,7 @@ export class Payment {
     @Column()
     reference: string;
 
-    @Column()
+    @Column({type: 'numeric'})
     amount: number;
 
     @Column()
@@ -25,8 +25,8 @@ export class Payment {
     @JoinColumn({ name: 'appointment_id' })
     appointment_id: Appointment;
 
-    @ManyToOne(() => PaymentMethod, paymentMethod => paymentMethod.payments) // Relación ManyToOne con PaymentMethod
-    @JoinColumn({ name: 'payment_method_id' }) // Columna en la tabla payments que referencia a payment_methods
+    @ManyToOne(() => PaymentMethod, paymentMethod => paymentMethod.payments) 
+    @JoinColumn({ name: 'payment_method_id' }) 
     payment_method_id: PaymentMethod;
 
     @CreateDateColumn()
