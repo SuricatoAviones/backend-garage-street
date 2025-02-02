@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsArray, IsDate, IsObject, IsString, IsBoolean, ValidateNested } from "class-validator";
+import { IsArray, IsDate, IsObject, IsString, IsBoolean, ValidateNested, IsOptional } from "class-validator";
 import { Product } from "src/products/entities/product.entity";
 import { Service } from "src/services/entities/service.entity";
 import { User } from "src/users/entities/user.entity";
@@ -9,10 +9,12 @@ import { Multer } from 'multer';
 
 class Observation {
     @ApiProperty({ type: 'string', format: 'binary' })
+    @IsOptional()
     img: Multer.File;
 
     @ApiProperty()
     @IsString()
+    @IsOptional()
     text: string;
 }
 
@@ -22,6 +24,7 @@ class Detail {
 
     @ApiProperty()
     @IsString()
+    @IsOptional()
     text: string;
 }
 
@@ -32,6 +35,7 @@ export class CreateAppointmentDto {
 
     @ApiProperty({ type: [Observation] })
     @IsArray()
+    @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => Observation)
     observations: Observation[];
@@ -51,6 +55,7 @@ export class CreateAppointmentDto {
     @ApiProperty({ type: [Detail] })
     @IsArray()
     @ValidateNested({ each: true })
+    @IsOptional()
     @Type(() => Detail)
     details: Detail[];
 
