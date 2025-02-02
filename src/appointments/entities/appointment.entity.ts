@@ -13,8 +13,8 @@ export class Appointment {
     @Column()
     date: Date
 
-    @Column()
-    observations: string
+    @Column("jsonb", { nullable: true })
+    observations: { img: string, text: string }[]
 
     @Column({nullable: true})
     typeService: string
@@ -24,6 +24,9 @@ export class Appointment {
 
     @Column()
     status: string;
+
+    @Column("jsonb", { nullable: true })
+    details: { img: string, text: string }[];
 
     @ManyToOne(() => User, user => user.appointments, { eager: true })
     @JoinColumn({ name: 'user_id' })

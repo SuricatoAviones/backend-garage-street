@@ -10,6 +10,7 @@ export class ResponseAppointmentDto {
     status: string;
     typeService: string;
     homeService: boolean;
+    details: { img: string, text: string }[];
     user: User;
     vehicle: Vehicle;
     services: Service[];
@@ -24,6 +25,7 @@ export class ResponseAppointmentDto {
         this.typeService = appointment.typeService;
         this.homeService = appointment.homeService;
         this.status = appointment.status;
+        this.details = appointment.details;
         this.user = appointment.user_id ? appointment.user_id : null;
         this.vehicle = appointment.vehicle_id ? appointment.vehicle_id : null;
         this.products = appointment.products_id ? appointment.products_id : [];
