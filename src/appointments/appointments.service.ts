@@ -63,6 +63,8 @@ export class AppointmentsService {
         {
           date: updateAppointmentDto.date,
           observations: updateAppointmentDto.observations,
+          typeService: updateAppointmentDto.typeService,
+          homeService: updateAppointmentDto.homeService,
           services_id: updateAppointmentDto.services_id,
           status: updateAppointmentDto.status,
           user_id: updateAppointmentDto.user_id,

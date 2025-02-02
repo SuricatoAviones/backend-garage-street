@@ -16,6 +16,12 @@ export class Appointment {
     @Column()
     observations: string
 
+    @Column({nullable: true})
+    typeService: string
+
+    @Column({nullable: true})
+    homeService: boolean
+
     @Column()
     status: string;
 

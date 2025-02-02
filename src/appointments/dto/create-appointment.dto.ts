@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsArray, IsDate, IsObject, IsString } from "class-validator";
+import { IsArray, IsDate, IsObject, IsString, IsBoolean } from "class-validator";
 import { Product } from "src/products/entities/product.entity";
 import { Service } from "src/services/entities/service.entity";
 import { User } from "src/users/entities/user.entity";
@@ -18,6 +18,14 @@ export class CreateAppointmentDto {
     @ApiProperty()
     @IsString()
     status: string;
+
+    @ApiProperty()
+    @IsString()
+    typeService: string;
+
+    @ApiProperty()
+    @IsBoolean()
+    homeService: boolean;	
 
     @ApiProperty()
     @IsObject()

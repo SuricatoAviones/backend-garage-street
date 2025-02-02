@@ -5,8 +5,11 @@ import { Product } from "src/products/entities/product.entity";
 
 export class ResponseAppointmentDto {
     appointment_id: number;
+    date: Date;
     observations: string;
     status: string;
+    typeService: string;
+    homeService: boolean;
     user_id: number;
     vehicle_id: number;
     services_id: number[];
@@ -16,7 +19,10 @@ export class ResponseAppointmentDto {
 
     constructor(appointment) {
         this.appointment_id = appointment.appointment_id;
+        this.date = appointment.date;
         this.observations = appointment.observations;
+        this.typeService = appointment.typeService;
+        this.homeService = appointment.homeService;
         this.status = appointment.status;
         this.user_id = appointment.user_id ? appointment.user_id.user_id : null;
         this.vehicle_id = appointment.vehicle_id ? appointment.vehicle_id.vehicle_id : null;
