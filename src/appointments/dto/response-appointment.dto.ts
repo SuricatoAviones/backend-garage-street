@@ -10,10 +10,10 @@ export class ResponseAppointmentDto {
     status: string;
     typeService: string;
     homeService: boolean;
-    user_id: number;
-    vehicle_id: number;
-    services_id: number[];
-    products_id: number[];
+    user: User;
+    vehicle: Vehicle;
+    services: Service[];
+    products: Product[];
     createdAt: Date;
     updatedAt: Date;
 
@@ -24,10 +24,10 @@ export class ResponseAppointmentDto {
         this.typeService = appointment.typeService;
         this.homeService = appointment.homeService;
         this.status = appointment.status;
-        this.user_id = appointment.user_id ? appointment.user_id.user_id : null;
-        this.vehicle_id = appointment.vehicle_id ? appointment.vehicle_id.vehicle_id : null;
-        this.products_id = appointment.products_id ? appointment.products_id.map(product => product.product_id) : [];
-        this.services_id = appointment.services_id ? appointment.services_id.map(service => service.service_id) : [];
+        this.user = appointment.user_id ? appointment.user_id : null;
+        this.vehicle = appointment.vehicle_id ? appointment.vehicle_id : null;
+        this.products = appointment.products_id ? appointment.products_id : [];
+        this.services = appointment.services_id ? appointment.services_id : [];
         this.createdAt = appointment.created_at;
         this.updatedAt = appointment.updated_at;
     }

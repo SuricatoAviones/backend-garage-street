@@ -16,18 +16,24 @@ export class AppointmentsService {
 
   private readonly logger = new Logger(AppointmentsService.name);
 
-  async create(createAppointmentDto: CreateAppointmentDto): Promise<ResponseAppointmentDto> {
-    this.logger.debug('Creating appointment with DTO:', createAppointmentDto);
-    try {
-      const appointment = this.appointmentRepository.create(createAppointmentDto);
-      const savedAppointment = await this.appointmentRepository.save(appointment);
-      this.logger.debug('Saved appointment:', savedAppointment);
-      return new ResponseAppointmentDto(savedAppointment);
-    } catch (error) {
-      this.logger.error('Error creating appointment:', error);
-      throw new BadRequestException(error.message);
-    }
+async create(createAppointmentDto: CreateAppointmentDto): Promise<ResponseAppointmentDto> {
+  this.logger.debug('Creating appointment with DTO:', createAppointmentDto);
+  try {
+    const appointment = this.appointmentRepository.create(createAppointmentDto);
+    const savedAppointment = await this.appointmentRepository.save(appointment);
+    this.logger.debug('Saved appointment:', savedAppointment);
+
+    const completeAppointment = await this.appointmentRepository.findOne({
+      where: { appointment_id: savedAppointment.appointment_id },
+      relations: ['user_id', 'vehicle_id', 'services_id', 'products_id'],
+    });
+
+    return new ResponseAppointmentDto(completeAppointment);
+  } catch (error) {
+    this.logger.error('Error creating appointment:', error);
+    throw new BadRequestException(error.message);
   }
+}
 
   async findAll() {
     try {
