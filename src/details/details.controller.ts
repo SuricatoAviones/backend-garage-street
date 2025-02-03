@@ -1,15 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { DetailsService } from './details.service';
 import { CreateDetailDto } from './dto/create-detail.dto';
 import { UpdateDetailDto } from './dto/update-detail.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Multer } from 'multer';
 
+@ApiTags('Details')
 @Controller('details')
 export class DetailsController {
   constructor(private readonly detailsService: DetailsService) {}
 
   @Post()
-  create(@Body() createDetailDto: CreateDetailDto) {
-    return this.detailsService.create(createDetailDto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('img'))
+  create(
+    @Body() createDetailDto: CreateDetailDto,
+    @UploadedFile() img: Multer.File,
+  ) {
+    return this.detailsService.create(createDetailDto, img);
   }
 
   @Get()
@@ -23,8 +32,14 @@ export class DetailsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDetailDto: UpdateDetailDto) {
-    return this.detailsService.update(+id, updateDetailDto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('img'))
+  update(
+    @Param('id') id: string,
+    @Body() updateDetailDto: UpdateDetailDto,
+    @UploadedFile() img: Multer.File,
+  ) {
+    return this.detailsService.update(+id, updateDetailDto, img);
   }
 
   @Delete(':id')
