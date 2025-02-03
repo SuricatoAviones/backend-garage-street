@@ -17,6 +17,9 @@ export class Payment {
     @Column()
     date: Date;
 
+    @Column({ nullable: true })
+    img: string;
+
     @ManyToOne(() => User, user => user.payments)
     @JoinColumn({ name: 'user_id' })
     user_id: User;

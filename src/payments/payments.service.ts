@@ -12,6 +12,7 @@ import { ResponsePaymentDto } from './dto/response-payment.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
+import { CloudinaryService } from 'src/common/services/cloudinary.service';
 
 @Injectable()
 export class PaymentsService {
@@ -24,6 +25,7 @@ export class PaymentsService {
     private appointmentRepository: Repository<Appointment>,
     @InjectRepository(PaymentMethod)
     private paymentMethodRepository: Repository<PaymentMethod>,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async create(
@@ -63,6 +65,10 @@ export class PaymentsService {
 
     // Si todos los IDs existen, crear el pago
     try {
+      if (createPaymentDto.img) {
+        const uploadResult = await this.cloudinaryService.uploadImage(createPaymentDto.img);
+        createPaymentDto.img = uploadResult.secure_url;
+      }
       const payment = this.paymentRepository.create(createPaymentDto);
       const savedPayment = await this.paymentRepository.save(payment);
       return new ResponsePaymentDto(savedPayment);
