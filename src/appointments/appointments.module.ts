@@ -8,9 +8,11 @@ import { Service } from 'src/services/entities/service.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Appointment } from './entities/appointment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Observation } from 'src/observations/entities/observation.entity';
+import { Detail } from 'src/details/entities/detail.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Appointment, Vehicle, Service, Product, ]), CloudinaryModule],
+  imports: [TypeOrmModule.forFeature([User, Appointment, Vehicle, Service, Product, Observation, Detail ]), CloudinaryModule],
   controllers: [AppointmentsController],
   providers: [AppointmentsService],
   exports: [AppointmentsService],

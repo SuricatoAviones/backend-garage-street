@@ -12,6 +12,8 @@ import { User } from 'src/users/entities/user.entity';
 import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Service } from 'src/services/entities/service.entity';
+import { Detail } from 'src/details/entities/detail.entity';
+import { Observation } from 'src/observations/entities/observation.entity';
 
 @Injectable()
 export class AppointmentsService {
@@ -24,6 +26,10 @@ export class AppointmentsService {
     private vehicleRepository: Repository<Vehicle>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(Detail)
+    private detailRepository: Repository<Detail>,
+    @InjectRepository(Observation)
+    private observationRepository: Repository<Observation>,
     @InjectRepository(Service)
     private serviceRepository: Repository<Service>,
     private readonly cloudinaryService: CloudinaryService,
@@ -70,30 +76,35 @@ export class AppointmentsService {
         }
       }
 
-      // Subir imágenes a Cloudinary y actualizar DTO
-      for (const observation of createAppointmentDto.observations) {
-        const file = files.find(f => f.originalname === observation.img.originalname);
-        if (file) {
-          const uploadResult = await this.cloudinaryService.uploadImage(file);
-          observation.img = uploadResult.secure_url;
-        }
-      }
-
-      for (const detail of createAppointmentDto.details) {
-        const file = files.find(f => f.originalname === detail.img.originalname);
-        if (file) {
-          const uploadResult = await this.cloudinaryService.uploadImage(file);
-          detail.img = uploadResult.secure_url;
-        }
-      }
-
+      // Crear la cita
       const appointment = this.appointmentRepository.create(createAppointmentDto);
       const savedAppointment = await this.appointmentRepository.save(appointment);
-      this.logger.debug('Saved appointment:', savedAppointment);
 
+      // Crear detalles y observaciones asociadas a la cita
+      if (createAppointmentDto.details) {
+        for (const detailDto of createAppointmentDto.details) {
+          const detail = this.detailRepository.create({
+            ...detailDto,
+            appointment: savedAppointment,
+          });
+          await this.detailRepository.save(detail);
+        }
+      }
+
+      if (createAppointmentDto.observations) {
+        for (const observationDto of createAppointmentDto.observations) {
+          const observation = this.observationRepository.create({
+            ...observationDto,
+            appointment: savedAppointment,
+          });
+          await this.observationRepository.save(observation);
+        }
+      }
+
+      // Obtener la cita completa con relaciones
       const completeAppointment = await this.appointmentRepository.findOne({
         where: { appointment_id: savedAppointment.appointment_id },
-        relations: ['user_id', 'vehicle_id', 'services_id', 'products_id'],
+        relations: ['user_id', 'vehicle_id', 'services_id', 'products_id', 'details', 'observations'],
       });
 
       return new ResponseAppointmentDto(completeAppointment);

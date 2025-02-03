@@ -1,64 +1,79 @@
-import { Payment } from "src/payments/entities/payment.entity";
-import { Product } from "src/products/entities/product.entity";
-import { Service } from "src/services/entities/service.entity";
-import { User } from "src/users/entities/user.entity";
-import { Vehicle } from "src/vehicles/entities/vehicle.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany } from "typeorm";
-
-@Entity({name:'appointments'})
-export class Appointment {
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+  } from 'typeorm';
+  import { User } from 'src/users/entities/user.entity';
+  import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
+  import { Service } from 'src/services/entities/service.entity';
+  import { Product } from 'src/products/entities/product.entity';
+  import { Payment } from 'src/payments/entities/payment.entity';
+  import { Detail } from 'src/details/entities/detail.entity'; // Importamos Detail
+  import { Observation } from 'src/observations/entities/observation.entity'; // Importamos Observation
+  
+  @Entity({ name: 'appointments' })
+  export class Appointment {
     @PrimaryGeneratedColumn()
-    appointment_id: number
-
+    appointment_id: number;
+  
     @Column()
-    date: Date
-
-    @Column("jsonb", { nullable: true })
-    observations: { img: string, text: string }[]
-
-    @Column({nullable: true})
-    typeService: string
-
-    @Column({nullable: true})
-    homeService: boolean
-
+    date: Date;
+  
+    @Column()
+    typeService: string;
+  
+    @Column()
+    homeService: boolean;
+  
     @Column()
     status: string;
-
-    @Column("jsonb", { nullable: true })
-    details: { img: string, text: string }[];
-
-    @ManyToOne(() => User, user => user.appointments, { eager: true })
+  
+    @ManyToOne(() => User, (user) => user.appointments, { eager: true })
     @JoinColumn({ name: 'user_id' })
     user_id: User;
-
-    @ManyToOne(() => Vehicle, vehicle => vehicle.appointments, { eager: true })
+  
+    @ManyToOne(() => Vehicle, (vehicle) => vehicle.appointments, { eager: true })
     @JoinColumn({ name: 'vehicle_id' })
     vehicle_id: Vehicle;
-
-    @ManyToMany(() => Service, service => service.appointments, { eager: true })
+  
+    @ManyToMany(() => Service, (service) => service.appointments, { eager: true })
     @JoinTable({
-        name: 'appointment_services',
-        joinColumn: { name: 'appointment_id', referencedColumnName: 'appointment_id' },
-        inverseJoinColumn: { name: 'service_id', referencedColumnName: 'service_id' }
+      name: 'appointment_services',
+      joinColumn: { name: 'appointment_id', referencedColumnName: 'appointment_id' },
+      inverseJoinColumn: { name: 'service_id', referencedColumnName: 'service_id' },
     })
     services_id: Service[];
-
-    @ManyToMany(() => Product, product => product.appointments, { eager: true })
+  
+    @ManyToMany(() => Product, (product) => product.appointments, { eager: true })
     @JoinTable({
-        name: 'appointment_products',
-        joinColumn: { name: 'appointment_id', referencedColumnName: 'appointment_id' },
-        inverseJoinColumn: { name: 'product_id', referencedColumnName: 'product_id' }
+      name: 'appointment_products',
+      joinColumn: { name: 'appointment_id', referencedColumnName: 'appointment_id' },
+      inverseJoinColumn: { name: 'product_id', referencedColumnName: 'product_id' },
     })
     products_id: Product[];
-
-    @OneToMany(() => Payment, payment => payment.appointment_id)
+  
+    @OneToMany(() => Payment, (payment) => payment.appointment_id)
     @JoinColumn()
     payments: Payment[];
-
+  
+    // Relación 1:N con Details
+    @OneToMany(() => Detail, (detail) => detail.appointment, { eager: true })
+    details: Detail[];
+  
+    // Relación 1:N con Observations
+    @OneToMany(() => Observation, (observation) => observation.appointment, { eager: true })
+    observations: Observation[];
+  
     @CreateDateColumn()
     created_at: Date;
-
+  
     @UpdateDateColumn()
     updated_at: Date;
-}
+  }
