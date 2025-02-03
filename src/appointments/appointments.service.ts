@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,12 +8,24 @@ import { ResponseAppointmentDto } from './dto/response-appointment.dto';
 import { Logger } from '@nestjs/common';
 import { CloudinaryService } from 'src/common/services/cloudinary.service';
 import { Multer } from 'multer';
+import { User } from 'src/users/entities/user.entity';
+import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
+import { Product } from 'src/products/entities/product.entity';
+import { Service } from 'src/services/entities/service.entity';
 
 @Injectable()
 export class AppointmentsService {
   constructor(
     @InjectRepository(Appointment)
     private appointmentRepository: Repository<Appointment>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Vehicle)
+    private vehicleRepository: Repository<Vehicle>,
+    @InjectRepository(Product)
+    private productRepository: Repository<Product>,
+    @InjectRepository(Service)
+    private serviceRepository: Repository<Service>,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
@@ -22,6 +34,42 @@ export class AppointmentsService {
   async create(createAppointmentDto: CreateAppointmentDto, files: Array<Multer.File>): Promise<ResponseAppointmentDto> {
     this.logger.debug('Creating appointment with DTO:', createAppointmentDto);
     try {
+      // Verificar si el user_id existe
+      const user = await this.userRepository.findOne({
+        where: { user_id: createAppointmentDto.user_id.user_id },
+      });
+      if (!user) {
+        throw new NotFoundException(`User with ID ${createAppointmentDto.user_id.user_id} not found`);
+      }
+
+      // Verificar si el vehicle_id existe
+      const vehicle = await this.vehicleRepository.findOne({
+        where: { vehicle_id: createAppointmentDto.vehicle_id.vehicle_id },
+      });
+      if (!vehicle) {
+        throw new NotFoundException(`Vehicle with ID ${createAppointmentDto.vehicle_id.vehicle_id} not found`);
+      }
+
+      // Verificar si los services_id existen
+      for (const service of createAppointmentDto.services_id) {
+        const serviceEntity = await this.serviceRepository.findOne({
+          where: { service_id: service.service_id },
+        });
+        if (!serviceEntity) {
+          throw new NotFoundException(`Service with ID ${service.service_id} not found`);
+        }
+      }
+
+      // Verificar si los products_id existen
+      for (const product of createAppointmentDto.products_id) {
+        const productEntity = await this.productRepository.findOne({
+          where: { product_id: product.product_id },
+        });
+        if (!productEntity) {
+          throw new NotFoundException(`Product with ID ${product.product_id} not found`);
+        }
+      }
+
       // Subir imágenes a Cloudinary y actualizar DTO
       for (const observation of createAppointmentDto.observations) {
         const file = files.find(f => f.originalname === observation.img.originalname);
