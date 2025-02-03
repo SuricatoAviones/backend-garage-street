@@ -71,6 +71,7 @@ class Observation {
   
     @ApiProperty()
     @IsArray()
+    @IsOptional()
     @Type(() => Service)
     services_id: Service[];
   
