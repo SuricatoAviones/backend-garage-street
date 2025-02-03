@@ -8,6 +8,7 @@ import { ResponseAppointmentDto } from './dto/response-appointment.dto';
 import { Logger } from '@nestjs/common';
 import { CloudinaryService } from 'src/common/services/cloudinary.service';
 import { Multer } from 'multer';
+
 @Injectable()
 export class AppointmentsService {
   constructor(

@@ -38,7 +38,7 @@ export class CreateAppointmentDto {
     @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => Observation)
-    observations: Observation[];
+    observations: Observation[] = []; // Inicializar como arreglo vacío
 
     @ApiProperty()
     @IsString()
@@ -57,7 +57,7 @@ export class CreateAppointmentDto {
     @ValidateNested({ each: true })
     @IsOptional()
     @Type(() => Detail)
-    details: Detail[];
+    details: Detail[] = []; // Inicializar como arreglo vacío
 
     @ApiProperty()
     @IsObject()
