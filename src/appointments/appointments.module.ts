@@ -10,9 +10,12 @@ import { Appointment } from './entities/appointment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Observation } from 'src/observations/entities/observation.entity';
 import { Detail } from 'src/details/entities/detail.entity';
+import { NotificationsModule } from 'src/notifications/notifications.module';
+
+
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Appointment, Vehicle, Service, Product, Observation, Detail ]), CloudinaryModule],
+  imports: [TypeOrmModule.forFeature([User, Appointment, Vehicle, Service, Product, Observation, Detail ]), CloudinaryModule, NotificationsModule ],
   controllers: [AppointmentsController],
   providers: [AppointmentsService],
   exports: [AppointmentsService],

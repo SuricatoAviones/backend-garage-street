@@ -7,9 +7,10 @@ import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entit
 import { PaymentsService } from './payments.service';
 import { PaymentsController } from './payments.controller';
 import { CloudinaryModule } from 'src/common/services/cloudinary.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Payment, Appointment, User, PaymentMethod]), CloudinaryModule], // Añade PaymentMethod
+    imports: [TypeOrmModule.forFeature([Payment, Appointment, User, PaymentMethod]), CloudinaryModule, NotificationsModule], // Añade PaymentMethod
     controllers: [PaymentsController],
     providers: [PaymentsService],
 })

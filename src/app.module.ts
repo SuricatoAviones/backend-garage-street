@@ -12,6 +12,7 @@ import { AppointmentsModule } from './appointments/appointments.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { DetailsModule } from './details/details.module';
 import { ObservationsModule } from './observations/observations.module';
+import { NotificationsGateway } from './notifications/notifications.gateway';
 
 @Module({
   imports: [
@@ -39,5 +40,6 @@ import { ObservationsModule } from './observations/observations.module';
     DetailsModule,
     ObservationsModule,
   ],
+  providers: [NotificationsGateway],
 })
 export class AppModule {}

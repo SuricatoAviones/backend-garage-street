@@ -13,6 +13,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import { CloudinaryService } from 'src/common/services/cloudinary.service';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
 
 @Injectable()
 export class PaymentsService {
@@ -25,6 +26,7 @@ export class PaymentsService {
     private appointmentRepository: Repository<Appointment>,
     @InjectRepository(PaymentMethod)
     private paymentMethodRepository: Repository<PaymentMethod>,
+    private readonly notificationsGateway: NotificationsGateway,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
@@ -71,6 +73,8 @@ export class PaymentsService {
       }
       const payment = this.paymentRepository.create(createPaymentDto);
       const savedPayment = await this.paymentRepository.save(payment);
+      // Emitir notificación
+    this.notificationsGateway.sendNotification('paymentCreated', savedPayment);
       return new ResponsePaymentDto(savedPayment);
     } catch (error) {
       throw new BadRequestException(error.message);

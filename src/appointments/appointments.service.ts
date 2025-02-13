@@ -7,6 +7,7 @@ import { Appointment } from './entities/appointment.entity';
 import { ResponseAppointmentDto } from './dto/response-appointment.dto';
 import { Logger } from '@nestjs/common';
 import { CloudinaryService } from 'src/common/services/cloudinary.service';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
 import { Multer } from 'multer';
 import { User } from 'src/users/entities/user.entity';
 import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
@@ -32,6 +33,7 @@ export class AppointmentsService {
     private observationRepository: Repository<Observation>,
     @InjectRepository(Service)
     private serviceRepository: Repository<Service>,
+    private readonly notificationsGateway: NotificationsGateway,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
@@ -106,6 +108,9 @@ export class AppointmentsService {
         where: { appointment_id: savedAppointment.appointment_id },
         relations: ['user_id', 'vehicle_id', 'services_id', 'products_id', 'details', 'observations'],
       });
+
+      // Emitir notificación
+      this.notificationsGateway.sendNotification('appointmentCreated', savedAppointment);
 
       return new ResponseAppointmentDto(completeAppointment);
     } catch (error) {
