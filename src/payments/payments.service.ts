@@ -168,6 +168,8 @@ export class PaymentsService {
         appointment_id: updatePaymentDto.appointment_id,
         payment_method_id: updatePaymentDto.payment_method_id,
       });
+      this.notificationsGateway.sendNotification('PaymentUpdate', updatePaymentDto);
+
       return this.findOne(payment_id);
     } catch (error) {
       throw new BadRequestException(error);
@@ -178,6 +180,8 @@ export class PaymentsService {
     try {
       const payment = await this.findOne(payment_id);
       await this.paymentRepository.delete(payment_id);
+      this.notificationsGateway.sendNotification('removePayment', payment);
+
       return payment;
     } catch (error) {
       throw new BadRequestException(error);

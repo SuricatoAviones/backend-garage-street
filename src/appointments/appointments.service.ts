@@ -163,6 +163,9 @@ export class AppointmentsService {
           products_id: updateAppointmentDto.products_id,
         },
       );
+
+      // Emitir notificación
+      this.notificationsGateway.sendNotification('appointmentUpdate', updateAppointmentDto);
       return this.findOne(appointment_id);
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -173,6 +176,8 @@ export class AppointmentsService {
     try {
       const appointment = await this.findOne(appointment_id);
       await this.appointmentRepository.delete(appointment_id);
+      this.notificationsGateway.sendNotification('removeAppointment', appointment);
+
       return appointment;
     } catch (error) {
       throw new BadRequestException(error.message);

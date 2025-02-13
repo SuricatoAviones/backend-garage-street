@@ -13,6 +13,7 @@ import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { DetailsModule } from './details/details.module';
 import { ObservationsModule } from './observations/observations.module';
 import { NotificationsGateway } from './notifications/notifications.gateway';
+import { BudgetsModule } from './budgets/budgets.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
     PaymentMethodsModule,
     DetailsModule,
     ObservationsModule,
+    BudgetsModule,
   ],
   providers: [NotificationsGateway],
 })
