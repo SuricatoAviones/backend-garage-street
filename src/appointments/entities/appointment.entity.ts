@@ -45,12 +45,18 @@ import { Budget } from 'src/budgets/entities/budget.entity';
     vehicle_id: Vehicle;
   
     @ManyToMany(() => Budget, (budget) => budget.appointments, { eager: true })
-    @JoinTable({
-      name: 'appointment_Budget',
-      joinColumn: { name: 'appointment_id', referencedColumnName: 'appointment_id' },
-      inverseJoinColumn: { name: 'budget_id', referencedColumnName: 'budget_id' },
-    })
-    budgets_id: Budget[];
+  @JoinTable({
+    name: 'appointment_budgets',
+    joinColumn: {
+      name: 'appointment_id',
+      referencedColumnName: 'appointment_id',
+    },
+    inverseJoinColumn: {
+      name: 'budget_id',
+      referencedColumnName: 'budget_id',
+    },
+  })
+  budgets_id: Budget[];
 
   
     @OneToMany(() => Payment, (payment) => payment.appointment_id)

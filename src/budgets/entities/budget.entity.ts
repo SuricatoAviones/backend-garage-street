@@ -1,14 +1,9 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
-  ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { Service } from 'src/services/entities/service.entity';
 import { Product } from 'src/products/entities/product.entity';
@@ -54,16 +49,5 @@ export class Budget {
   products_id: Product[];
 
   @ManyToMany(() => Appointment, (appointment) => appointment.budgets_id)
-  @JoinTable({
-    name: 'appointment_budgets',
-    joinColumn: {
-      name: 'budget_id',
-      referencedColumnName: 'budget_id',
-    },
-    inverseJoinColumn: {
-      name: 'appointment_id',
-      referencedColumnName: 'appointment_id',
-    },
-  })
   appointments: Appointment[];
 }
