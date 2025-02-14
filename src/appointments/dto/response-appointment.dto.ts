@@ -4,6 +4,7 @@ import { Service } from 'src/services/entities/service.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Detail } from 'src/details/entities/detail.entity'; // Importamos Detail
 import { Observation } from 'src/observations/entities/observation.entity'; // Importamos Observation
+import { Budget } from 'src/budgets/entities/budget.entity';
 
 export class ResponseAppointmentDto {
   appointment_id: number;
@@ -13,8 +14,7 @@ export class ResponseAppointmentDto {
   homeService: boolean;
   user: User;
   vehicle: Vehicle;
-  services: Service[];
-  products: Product[];
+  budgets: Budget[];
   details: Detail[]; // Agregamos detalles
   observations: Observation[]; // Agregamos observaciones
   createdAt: Date;
@@ -28,8 +28,7 @@ export class ResponseAppointmentDto {
     this.homeService = appointment.homeService;
     this.user = appointment.user_id ? appointment.user_id : null;
     this.vehicle = appointment.vehicle_id ? appointment.vehicle_id : null;
-    this.services = appointment.services_id ? appointment.services_id : [];
-    this.products = appointment.products_id ? appointment.products_id : [];
+    this.budgets = appointment.budgets_id ? appointment.budgets_id : [];
     this.details = appointment.details ? appointment.details : []; // Mapeamos detalles
     this.observations = appointment.observations ? appointment.observations : []; // Mapeamos observaciones
     this.createdAt = appointment.created_at;

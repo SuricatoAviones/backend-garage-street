@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { ObservationsService } from './observations.service';
 import { CreateObservationDto } from './dto/create-observation.dto';
 import { UpdateObservationDto } from './dto/update-observation.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Multer } from 'multer';
 
@@ -13,12 +13,12 @@ export class ObservationsController {
 
   @Post()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('img'))
+  @UseInterceptors(FilesInterceptor('img'))
   create(
     @Body() createObservationDto: CreateObservationDto,
-    @UploadedFile() img: Multer.File,
+    @UploadedFiles() imgs: Multer.File[],
   ) {
-    return this.observationsService.create(createObservationDto, img);
+    return this.observationsService.create(createObservationDto, imgs);
   }
 
   @Get()
@@ -33,13 +33,13 @@ export class ObservationsController {
 
   @Patch(':id')
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('img'))
+  @UseInterceptors(FilesInterceptor('img'))
   update(
     @Param('id') id: string,
     @Body() updateObservationDto: UpdateObservationDto,
-    @UploadedFile() img: Multer.File,
+    @UploadedFiles() imgs: Multer.File[],
   ) {
-    return this.observationsService.update(+id, updateObservationDto, img);
+    return this.observationsService.update(+id, updateObservationDto, imgs);
   }
 
   @Delete(':id')

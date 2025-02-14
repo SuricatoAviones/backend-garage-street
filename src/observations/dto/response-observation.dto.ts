@@ -1,7 +1,7 @@
 export class  ResponseObservationDto {
     observation_id: number;
     text: string;
-    img: string;
+    img: string[];
     createdAt: Date;
     updatedAt: Date;
 

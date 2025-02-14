@@ -10,6 +10,7 @@ import {
 import { Roles } from '../enums/roles.enum';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
+import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -33,6 +34,10 @@ export class User {
 
   @Column({ nullable: true }) // Nuevo campo para la foto de perfil
   profilePicture: string;
+
+  @OneToMany(() => Vehicle, (vehicle) => vehicle.user_id)
+  @JoinColumn()
+  vehicles: Vehicle[];
 
   @OneToMany(() => Appointment, (appointment) => appointment.user_id)
   @JoinColumn()

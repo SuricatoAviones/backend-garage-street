@@ -1,40 +1,48 @@
-import { Appointment } from "src/appointments/entities/appointment.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Appointment } from 'src/appointments/entities/appointment.entity';
+import { Budget } from 'src/budgets/entities/budget.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity({name:'products'})
+@Entity({ name: 'products' })
 export class Product {
-    @PrimaryGeneratedColumn()
-    product_id: number
+  @PrimaryGeneratedColumn()
+  product_id: number;
 
-    @Column()
-    name: string
+  @Column()
+  name: string;
 
-    @Column()
-    description: string
+  @Column()
+  description: string;
 
-    @Column()
-    brand: string
+  @Column()
+  brand: string;
 
-    @Column()
-    model: string
+  @Column()
+  model: string;
 
-    @Column()
-    price: number
+  @Column()
+  price: number;
 
-    @Column()
-    code: string;
+  @Column()
+  code: string;
 
-    @Column()
-    stock: number;
+  @Column()
+  stock: number;
 
-    @ManyToMany(()=> Appointment, appointment => appointment.products_id)
-    @JoinColumn()
-    appointments: Appointment[];
+  @ManyToMany(() => Budget, (budget) => budget.products_id)
+  @JoinColumn()
+  budgets: Budget[];
 
-    @CreateDateColumn()
-    created_at: Date;
+  @CreateDateColumn()
+  created_at: Date;
 
-    @UpdateDateColumn()
-    updated_at: Date;
-
+  @UpdateDateColumn()
+  updated_at: Date;
 }

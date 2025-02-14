@@ -7,6 +7,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
 import { Service } from 'src/services/entities/service.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { Budget } from 'src/budgets/entities/budget.entity';
 
 export class CreateAppointmentDto {
   @ApiProperty()
@@ -49,11 +50,8 @@ export class CreateAppointmentDto {
 
   @ApiProperty()
   @IsArray()
-  @Type(() => Service)
-  services_id: Service[];
+  @Type(() => Budget)
+  budgets_id: Budget[];
 
-  @ApiProperty()
-  @IsArray()
-  @Type(() => Product)
-  products_id: Product[];
+ 
 }

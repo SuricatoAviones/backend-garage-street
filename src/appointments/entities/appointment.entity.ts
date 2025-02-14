@@ -17,6 +17,7 @@ import {
   import { Payment } from 'src/payments/entities/payment.entity';
   import { Detail } from 'src/details/entities/detail.entity'; // Importamos Detail
   import { Observation } from 'src/observations/entities/observation.entity'; // Importamos Observation
+import { Budget } from 'src/budgets/entities/budget.entity';
   
   @Entity({ name: 'appointments' })
   export class Appointment {
@@ -43,21 +44,14 @@ import {
     @JoinColumn({ name: 'vehicle_id' })
     vehicle_id: Vehicle;
   
-    @ManyToMany(() => Service, (service) => service.appointments, { eager: true })
+    @ManyToMany(() => Budget, (budget) => budget.appointments, { eager: true })
     @JoinTable({
-      name: 'appointment_services',
+      name: 'appointment_Budget',
       joinColumn: { name: 'appointment_id', referencedColumnName: 'appointment_id' },
-      inverseJoinColumn: { name: 'service_id', referencedColumnName: 'service_id' },
+      inverseJoinColumn: { name: 'budget_id', referencedColumnName: 'budget_id' },
     })
-    services_id: Service[];
-  
-    @ManyToMany(() => Product, (product) => product.appointments, { eager: true })
-    @JoinTable({
-      name: 'appointment_products',
-      joinColumn: { name: 'appointment_id', referencedColumnName: 'appointment_id' },
-      inverseJoinColumn: { name: 'product_id', referencedColumnName: 'product_id' },
-    })
-    products_id: Product[];
+    budgets_id: Budget[];
+
   
     @OneToMany(() => Payment, (payment) => payment.appointment_id)
     @JoinColumn()
