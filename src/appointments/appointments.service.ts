@@ -144,33 +144,73 @@ export class AppointmentsService {
   }
 
   async update(
-    appointment_id: number,
-    updateAppointmentDto: UpdateAppointmentDto,
-  ) {
-    try {
-      await this.appointmentRepository.update(
-        appointment_id,
-        {
-          date: updateAppointmentDto.date,
-          observations: updateAppointmentDto.observations,
-          typeService: updateAppointmentDto.typeService,
-          homeService: updateAppointmentDto.homeService,
-          services_id: updateAppointmentDto.services_id,
-          status: updateAppointmentDto.status,
-          details: updateAppointmentDto.details,
-          user_id: updateAppointmentDto.user_id,
-          vehicle_id: updateAppointmentDto.vehicle_id,
-          products_id: updateAppointmentDto.products_id,
-        },
-      );
+  appointment_id: number,
+  updateAppointmentDto: UpdateAppointmentDto,
+) {
+  try {
+    // First, find the existing appointment
+    const existingAppointment = await this.appointmentRepository.findOne({
+      where: { appointment_id },
+      relations: ['observations', 'details']
+    });
 
-      // Emitir notificación
-      this.notificationsGateway.sendNotification('appointmentUpdate', updateAppointmentDto);
-      return this.findOne(appointment_id);
-    } catch (error) {
-      throw new BadRequestException(error.message);
+    if (!existingAppointment) {
+      throw new NotFoundException(`Appointment with ID ${appointment_id} not found`);
     }
+
+    // Remove observations field from the direct update
+    const {observations, details, ...updateData} = updateAppointmentDto;
+
+    // Update the main appointment data
+    await this.appointmentRepository.update(
+      appointment_id,
+      updateData
+    );
+
+    // Handle observations separately
+    if (observations) {
+      // Remove existing observations
+      await this.observationRepository.delete({
+        appointment: { appointment_id }
+      });
+
+      // Create new observations
+      for (const observationDto of observations) {
+        const observation = this.observationRepository.create({
+          ...observationDto,
+          appointment: existingAppointment
+        });
+        await this.observationRepository.save(observation);
+      }
+    }
+
+    // Handle details separately
+    if (details) {
+      // Remove existing details
+      await this.detailRepository.delete({
+        appointment: { appointment_id }
+      });
+
+      // Create new details
+      for (const detailDto of details) {
+        const detail = this.detailRepository.create({
+          ...detailDto,
+          appointment: existingAppointment
+        });
+        await this.detailRepository.save(detail);
+      }
+    }
+
+    // Emit notification
+    this.notificationsGateway.sendNotification('appointmentUpdate', updateAppointmentDto);
+    
+    // Return updated appointment
+    return this.findOne(appointment_id);
+  } catch (error) {
+    throw new BadRequestException(error.message);
   }
+}
+
 
   async remove(appointment_id: number): Promise<ResponseAppointmentDto> {
     try {
