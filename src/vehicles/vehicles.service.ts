@@ -55,6 +55,7 @@ export class VehiclesService {
         model: updateVehicleDto.model,
         plate: updateVehicleDto.plate,
         year: updateVehicleDto.year,
+        user_id: updateVehicleDto.user,
       });
       return this.findOne(vehicle_id);
     } catch (error) {
