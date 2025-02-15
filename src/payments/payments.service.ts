@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
@@ -14,7 +10,7 @@ import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import { CloudinaryService } from 'src/common/services/cloudinary.service';
 import { NotificationsGateway } from 'src/notifications/notifications.gateway';
-
+import {Multer} from 'multer';
 @Injectable()
 export class PaymentsService {
   constructor(
@@ -32,6 +28,7 @@ export class PaymentsService {
 
   async create(
     createPaymentDto: CreatePaymentDto,
+    file: Multer.File,
   ): Promise<ResponsePaymentDto> {
     // Verificar si el user_id existe
     const user = await this.userRepository.findOne({
@@ -65,20 +62,24 @@ export class PaymentsService {
       );
     }
 
-    // Si todos los IDs existen, crear el pago
-    try {
-      if (createPaymentDto.img) {
-        const uploadResult = await this.cloudinaryService.uploadImage(createPaymentDto.img);
-        createPaymentDto.img = uploadResult.secure_url;
-      }
-      const payment = this.paymentRepository.create(createPaymentDto);
-      const savedPayment = await this.paymentRepository.save(payment);
-      // Emitir notificación
-    this.notificationsGateway.sendNotification('paymentCreated', savedPayment);
-      return new ResponsePaymentDto(savedPayment);
-    } catch (error) {
-      throw new BadRequestException(error.message);
+    // Subir la imagen a Cloudinary si se proporciona
+    let imgUrl: string = null;
+    if (file) {
+      const uploadResult = await this.cloudinaryService.uploadImage(file);
+      imgUrl = uploadResult.secure_url;
     }
+
+    // Crear el pago
+    const payment = this.paymentRepository.create({
+      ...createPaymentDto,
+      img: imgUrl,
+    });
+    const savedPayment = await this.paymentRepository.save(payment);
+
+    // Emitir notificación
+    this.notificationsGateway.sendNotification('paymentCreated', savedPayment);
+
+    return new ResponsePaymentDto(savedPayment);
   }
 
   async findAll(): Promise<ResponsePaymentDto[]> {
