@@ -40,54 +40,42 @@ export class PaymentsService {
     return field[key] ? field[key] : field;
   }
 
-  async create(
-    createPaymentDto: CreatePaymentDto,
-    file: Multer.File,
-  ): Promise<ResponsePaymentDto> {
-    // Convertir y extraer IDs en caso de enviarlos como strings JSON
-    const userId = this.parseField(createPaymentDto.user_id, 'user_id');
-    const appointmentId = this.parseField(createPaymentDto.appointment_id, 'appointment_id');
-    const paymentMethodId = this.parseField(createPaymentDto.payment_method_id, 'payment_method_id');
+async create(paymentData: any, files: Multer.File[]): Promise<ResponsePaymentDto> {
+    const { amount, reference, date, user_id, appointment_id, payment_method_id } = paymentData;
 
-    // Verificar si el user_id existe
-    const user = await this.userRepository.findOne({
-      where: { user_id: userId },
-    });
+    const user = await this.userRepository.findOne({ where: { user_id } });
     if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
+      throw new NotFoundException(`User with ID ${user_id} not found`);
     }
 
-    // Verificar si el appointment_id existe
-    const appointment = await this.appointmentRepository.findOne({
-      where: { appointment_id: appointmentId },
-    });
+    const appointment = await this.appointmentRepository.findOne({ where: { appointment_id } });
     if (!appointment) {
-      throw new NotFoundException(`Appointment with ID ${appointmentId} not found`);
+      throw new NotFoundException(`Appointment with ID ${appointment_id} not found`);
     }
 
-    // Verificar si el payment_method_id existe
-    const paymentMethod = await this.paymentMethodRepository.findOne({
-      where: { payment_method_id: paymentMethodId },
-    });
+    const paymentMethod = await this.paymentMethodRepository.findOne({ where: { payment_method_id } });
     if (!paymentMethod) {
-      throw new NotFoundException(`Payment Method with ID ${paymentMethodId} not found`);
+      throw new NotFoundException(`Payment Method with ID ${payment_method_id} not found`);
     }
 
-    // Subir la imagen a Cloudinary si se proporciona
     let imgUrl: string = null;
-    if (file) {
-      const uploadResult = await this.cloudinaryService.uploadImage(file);
+    if (files && files.length > 0) {
+      const uploadResult = await this.cloudinaryService.uploadImage(files[0]);
       imgUrl = uploadResult.secure_url;
     }
 
-    // Crear el pago
     const payment = this.paymentRepository.create({
-      ...createPaymentDto,
+      amount,
+      reference,
+      date,
+      user_id: user,
+      appointment_id: appointment,
+      payment_method_id: paymentMethod,
       img: imgUrl,
     });
+
     const savedPayment = await this.paymentRepository.save(payment);
 
-    // Emitir notificación
     this.notificationsGateway.sendNotification('paymentCreated', savedPayment);
 
     return new ResponsePaymentDto(savedPayment);

@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFiles, Request, ParseFilePipe, FileTypeValidator, MaxFileSizeValidator } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes } from '@nestjs/swagger';
 import { Multer } from 'multer';
+import { Request as ExpressRequest } from 'express';
 
 @Controller('payments')
 export class PaymentsController {
@@ -12,9 +13,23 @@ export class PaymentsController {
 
   @Post()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('img'))
-  create(@Body() createPaymentDto: CreatePaymentDto, @UploadedFile() img: Multer.File) {
-    return this.paymentsService.create(createPaymentDto, img);
+  @UseInterceptors(FilesInterceptor('imagenes'))
+  async create(
+    @Body() createPaymentDto: CreatePaymentDto,
+    @UploadedFiles(new ParseFilePipe({
+      validators: [
+        new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif)$/ }),
+        new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), // 5MB
+      ],
+    }))
+    files: Multer.File[],
+    @Request() req: ExpressRequest,
+  ) {
+    const jsonData = JSON.parse(req.headers['x-json-payload'] as string);
+
+    const paymentData = { ...createPaymentDto, ...jsonData };
+
+    return this.paymentsService.create(paymentData, files);
   }
 
   @Get()
