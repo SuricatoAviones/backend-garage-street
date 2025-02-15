@@ -10,7 +10,8 @@ import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import { CloudinaryService } from 'src/common/services/cloudinary.service';
 import { NotificationsGateway } from 'src/notifications/notifications.gateway';
-import {Multer} from 'multer';
+import { Multer } from 'multer';
+
 @Injectable()
 export class PaymentsService {
   constructor(
@@ -26,40 +27,50 @@ export class PaymentsService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
+  // Helper para parsear campos que pueden venir como JSON string o ya convertidos
+  private parseField(field: any, key: string) {
+    if (typeof field === 'string') {
+      try {
+        const parsed = JSON.parse(field);
+        return parsed[key] ?? parsed;
+      } catch (error) {
+        throw new BadRequestException(`Invalid JSON format in field ${key}`);
+      }
+    }
+    return field[key] ? field[key] : field;
+  }
+
   async create(
     createPaymentDto: CreatePaymentDto,
     file: Multer.File,
   ): Promise<ResponsePaymentDto> {
+    // Convertir y extraer IDs en caso de enviarlos como strings JSON
+    const userId = this.parseField(createPaymentDto.user_id, 'user_id');
+    const appointmentId = this.parseField(createPaymentDto.appointment_id, 'appointment_id');
+    const paymentMethodId = this.parseField(createPaymentDto.payment_method_id, 'payment_method_id');
+
     // Verificar si el user_id existe
     const user = await this.userRepository.findOne({
-      where: { user_id: createPaymentDto.user_id.user_id },
+      where: { user_id: userId },
     });
     if (!user) {
-      throw new NotFoundException(
-        `User with ID ${createPaymentDto.user_id.user_id} not found`,
-      );
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
     // Verificar si el appointment_id existe
     const appointment = await this.appointmentRepository.findOne({
-      where: { appointment_id: createPaymentDto.appointment_id.appointment_id },
+      where: { appointment_id: appointmentId },
     });
     if (!appointment) {
-      throw new NotFoundException(
-        `Appointment with ID ${createPaymentDto.appointment_id.appointment_id} not found`,
-      );
+      throw new NotFoundException(`Appointment with ID ${appointmentId} not found`);
     }
 
     // Verificar si el payment_method_id existe
     const paymentMethod = await this.paymentMethodRepository.findOne({
-      where: {
-        payment_method_id: createPaymentDto.payment_method_id.payment_method_id,
-      },
+      where: { payment_method_id: paymentMethodId },
     });
     if (!paymentMethod) {
-      throw new NotFoundException(
-        `Payment Method with ID ${createPaymentDto.payment_method_id.payment_method_id} not found`,
-      );
+      throw new NotFoundException(`Payment Method with ID ${paymentMethodId} not found`);
     }
 
     // Subir la imagen a Cloudinary si se proporciona
@@ -120,46 +131,37 @@ export class PaymentsService {
       throw new NotFoundException(`Payment with ID ${payment_id} not found`);
     }
 
-    // Verificar si el user_id existe (si se proporciona)
+    // Si se proporciona, parsear los campos
     if (updatePaymentDto.user_id) {
+      const userId = this.parseField(updatePaymentDto.user_id, 'user_id');
       const user = await this.userRepository.findOne({
-        where: { user_id: updatePaymentDto.user_id.user_id },
+        where: { user_id: userId },
       });
       if (!user) {
-        throw new NotFoundException(
-          `User with ID ${updatePaymentDto.user_id.user_id} not found`,
-        );
+        throw new NotFoundException(`User with ID ${userId} not found`);
       }
     }
 
-    // Verificar si el appointment_id existe (si se proporciona)
     if (updatePaymentDto.appointment_id) {
+      const appointmentId = this.parseField(updatePaymentDto.appointment_id, 'appointment_id');
       const appointment = await this.appointmentRepository.findOne({
-        where: {
-          appointment_id: updatePaymentDto.appointment_id.appointment_id,
-        },
+        where: { appointment_id: appointmentId },
       });
       if (!appointment) {
-        throw new NotFoundException(
-          `Appointment with ID ${updatePaymentDto.appointment_id.appointment_id} not found`,
-        );
+        throw new NotFoundException(`Appointment with ID ${appointmentId} not found`);
       }
     }
 
-    // Verificar si el payment_method_id existe (si se proporciona)
     if (updatePaymentDto.payment_method_id) {
+      const paymentMethodId = this.parseField(updatePaymentDto.payment_method_id, 'payment_method_id');
       const paymentMethod = await this.paymentMethodRepository.findOne({
-        where: {
-          payment_method_id:
-            updatePaymentDto.payment_method_id.payment_method_id,
-        },
+        where: { payment_method_id: paymentMethodId },
       });
       if (!paymentMethod) {
-        throw new NotFoundException(
-          `Payment Method with ID ${updatePaymentDto.payment_method_id.payment_method_id} not found`,
-        );
+        throw new NotFoundException(`Payment Method with ID ${paymentMethodId} not found`);
       }
     }
+
     try {
       await this.paymentRepository.update(payment_id, {
         amount: updatePaymentDto.amount,

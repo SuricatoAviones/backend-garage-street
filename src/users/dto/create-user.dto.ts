@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Multer } from 'multer'; // Importa Express para manejar archivos
+import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
 
 export class CreateUserDto {
   @ApiProperty()
@@ -23,6 +25,12 @@ export class CreateUserDto {
   @ApiProperty()
   @IsString()
   rol: string;
+
+  @ApiProperty({ type: Vehicle })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => Vehicle)
+  vehicle?: Vehicle;
 
   @ApiProperty({ type: 'string', format: 'binary', required: false }) // Indica que es un archivo
   @IsOptional()
