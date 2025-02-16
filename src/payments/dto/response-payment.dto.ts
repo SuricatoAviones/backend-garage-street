@@ -7,6 +7,7 @@ export class ResponsePaymentDto {
     amount: number;
     date: Date;
     reference: string;
+    img: string;
     user: User;
     appointment: Appointment;
     payment_method: PaymentMethod;
@@ -18,6 +19,7 @@ export class ResponsePaymentDto {
         this.amount = payment.amount;
         this.date = payment.date;
         this.reference = payment.reference;
+        this.img = payment.img;
         this.user = payment.user_id ? payment.user_id : null;
         this.appointment = payment.appointment_id ? payment.appointment_id : null;
         this.payment_method = payment.payment_method_id ? payment.payment_method_id : null;

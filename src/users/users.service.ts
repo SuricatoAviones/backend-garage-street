@@ -29,40 +29,40 @@ export class UsersService {
       if (!Object.values(Roles).includes(createUserDto.rol as Roles)) {
         throw new BadRequestException('Rol no definido');
       }
-
+  
       let profilePictureUrl: string | undefined;
-
-      // Si se proporciona una foto de perfil, súbela a Cloudinary
       if (createUserDto.profilePicture) {
-        const uploadResult = await this.cloudinaryService.uploadImage(
-          createUserDto.profilePicture,
-        );
+        const uploadResult = await this.cloudinaryService.uploadImage(createUserDto.profilePicture);
         profilePictureUrl = uploadResult.secure_url;
       }
-
+  
       const user = this.userRepository.create({
         name: createUserDto.name,
         password: await bcryptjs.hash(createUserDto.password, 10),
         email: createUserDto.email,
         phone: createUserDto.phone,
         rol: createUserDto.rol,
-        profilePicture: profilePictureUrl, // Asigna la URL de la foto de perfil
+        profilePicture: profilePictureUrl,
       });
-
-      const savedUser = await this.userRepository.save(user);
-
-      // Si se proporciona un ID para el vehículo, lo asignamos al usuario
-    if (createUserDto.vehicle) {
-      const vehicle = await this.vehicleRepository.findOne({ 
-        where: { vehicle_id: createUserDto.vehicle } 
-      });
-      if (!vehicle) {
-        throw new NotFoundException('Vehículo no encontrado');
+  
+      let savedUser = await this.userRepository.save(user);
+  
+      if (createUserDto.vehicle) {
+        const vehicle = await this.vehicleRepository.findOne({ 
+          where: { vehicle_id: createUserDto.vehicle } 
+        });
+        if (!vehicle) {
+          throw new NotFoundException('Vehículo no encontrado');
+        }
+        vehicle.user_id = savedUser;
+        await this.vehicleRepository.save(vehicle);
+        // Recargar el usuario para traer las relaciones actualizadas
+        savedUser = await this.userRepository.findOne({
+          where: { user_id: savedUser.user_id },
+          relations: ['vehicles'],
+        });
       }
-      vehicle.user_id = savedUser;
-      await this.vehicleRepository.save(vehicle);
-    }
-
+  
       return new ResponseUserDto(savedUser);
     } catch (error) {
       throw new BadRequestException(error);
