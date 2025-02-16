@@ -10,10 +10,10 @@ export class Service {
     @Column()
     name: string;
 
-    @Column()
+    @Column({nullable: true})
     description: string;
     
-    @Column()
+    @Column({nullable: true})
     price: number;
 
     @ManyToMany(()=> Budget, budget => budget.services_id)

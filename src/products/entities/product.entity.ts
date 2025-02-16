@@ -18,22 +18,22 @@ export class Product {
   @Column()
   name: string;
 
-  @Column()
+  @Column({nullable: true})
   description: string;
 
-  @Column()
+  @Column({nullable: true})
   brand: string;
 
-  @Column()
+  @Column({nullable: true})
   model: string;
 
-  @Column()
+  @Column({nullable: true})
   price: number;
 
-  @Column()
+  @Column({nullable: true})
   code: string;
 
-  @Column()
+  @Column({nullable: true})
   stock: number;
 
   @ManyToMany(() => Budget, (budget) => budget.products_id)
