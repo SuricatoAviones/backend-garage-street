@@ -51,14 +51,17 @@ export class UsersService {
 
       const savedUser = await this.userRepository.save(user);
 
-      // Si se proporciona un vehículo, guárdalo y asígnalo al usuario
-      if (createUserDto.vehicle) {
-        const vehicle = this.vehicleRepository.create({
-          ...createUserDto.vehicle,
-          user_id: savedUser,
-        });
-        await this.vehicleRepository.save(vehicle);
+      // Si se proporciona un ID para el vehículo, lo asignamos al usuario
+    if (createUserDto.vehicle) {
+      const vehicle = await this.vehicleRepository.findOne({ 
+        where: { vehicle_id: createUserDto.vehicle } 
+      });
+      if (!vehicle) {
+        throw new NotFoundException('Vehículo no encontrado');
       }
+      vehicle.user_id = savedUser;
+      await this.vehicleRepository.save(vehicle);
+    }
 
       return new ResponseUserDto(savedUser);
     } catch (error) {

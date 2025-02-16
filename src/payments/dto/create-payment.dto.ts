@@ -1,9 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, IsDate, IsObject } from 'class-validator';
+import { IsNumber, IsString, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
-import { User } from 'src/users/entities/user.entity';
-import { Appointment } from 'src/appointments/entities/appointment.entity';
-import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 
 export class CreatePaymentDto {
   @ApiProperty()
@@ -19,18 +16,18 @@ export class CreatePaymentDto {
   @Type(() => Date)
   date: Date;
 
-  @ApiProperty()
-  @IsObject()
-  @Type(() => User)
-  user_id: User;
+  @ApiProperty({ type: Number, description: 'ID of the user' })
+  @IsNumber()
+  @Type(() => Number)
+  user_id: number;
 
-  @ApiProperty()
-  @IsObject()
-  @Type(() => Appointment)
-  appointment_id: Appointment;
+  @ApiProperty({ type: Number, description: 'ID of the appointment' })
+  @IsNumber()
+  @Type(() => Number)
+  appointment_id: number;
 
-  @ApiProperty()
-  @IsObject()
-  @Type(() => PaymentMethod)
-  payment_method_id: PaymentMethod;
+  @ApiProperty({ type: Number, description: 'ID of the payment method' })
+  @IsNumber()
+  @Type(() => Number)
+  payment_method_id: number;
 }
