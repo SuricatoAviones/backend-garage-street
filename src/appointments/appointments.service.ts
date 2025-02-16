@@ -163,7 +163,7 @@ export class AppointmentsService {
 
   async update(appointment_id: number, updateAppointmentDto: UpdateAppointmentDto) {
     try {
-      // Buscar la cita existente con relaciones de observaciones, detalles y budgets
+      // Buscar la cita existente con sus relaciones
       const existingAppointment = await this.appointmentRepository.findOne({
         where: { appointment_id },
         relations: ['observations', 'details', 'budgets_id'],
@@ -171,11 +171,14 @@ export class AppointmentsService {
       if (!existingAppointment) {
         throw new NotFoundException(`Appointment with ID ${appointment_id} not found`);
       }
-
+  
       // Extraer observaciones, detalles y budgets del payload
       const { details, observations, budgets_id, ...updateData } = updateAppointmentDto;
-
-      // Procesar budgets enviados en el payload para la actualización
+  
+      // Actualizar los campos simples de la cita
+      Object.assign(existingAppointment, updateData);
+  
+      // Procesar budgets enviados en el payload
       if (budgets_id && Array.isArray(budgets_id)) {
         const updatedBudgets: Budget[] = [];
         for (const budgetDto of budgets_id) {
@@ -193,13 +196,10 @@ export class AppointmentsService {
             updatedBudgets.push(savedBudget);
           }
         }
-        (updateData as any).budgets_id = updatedBudgets;
+        existingAppointment.budgets_id = updatedBudgets;
       }
-
-      // Actualizar la información principal de la cita
-      await this.appointmentRepository.update(appointment_id, updateData);
-
-      // Manejar observaciones: eliminar las existentes y crearlas de nuevo
+  
+      // Actualizar observaciones: eliminar las existentes y crearlas de nuevo
       if (observations) {
         await this.observationRepository.delete({ appointment: { appointment_id } });
         for (const observationDto of observations) {
@@ -210,8 +210,8 @@ export class AppointmentsService {
           await this.observationRepository.save(observation);
         }
       }
-
-      // Manejar detalles: eliminar los existentes y crearlos de nuevo
+  
+      // Actualizar detalles: eliminar los existentes y crearlos de nuevo
       if (details) {
         await this.detailRepository.delete({ appointment: { appointment_id } });
         for (const detailDto of details) {
@@ -222,11 +222,13 @@ export class AppointmentsService {
           await this.detailRepository.save(detail);
         }
       }
-
+  
+      // Guardar la cita actualizada (incluyendo la relación many-to-many budgets_id)
+      const savedAppointment = await this.appointmentRepository.save(existingAppointment);
+  
       // Emitir notificación de actualización
       this.notificationsGateway.sendNotification('appointmentUpdate', updateAppointmentDto);
-
-      // Retornar la cita actualizada con relaciones
+  
       return this.findOne(appointment_id);
     } catch (error) {
       throw new BadRequestException(error.message);
