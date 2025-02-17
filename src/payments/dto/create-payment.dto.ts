@@ -12,6 +12,10 @@ export class CreatePaymentDto {
   reference: string;
 
   @ApiProperty()
+  @IsString()
+  status: string;
+
+  @ApiProperty()
   @IsDate()
   @Type(() => Date)
   date: Date;

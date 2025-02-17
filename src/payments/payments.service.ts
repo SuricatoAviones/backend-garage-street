@@ -80,6 +80,7 @@ export class PaymentsService {
       amount: createPaymentDto.amount,
       reference: createPaymentDto.reference,
       date: createPaymentDto.date,
+      status: createPaymentDto.status,
       user_id: user,
       appointment_id: appointment,
       payment_method_id: paymentMethod,
@@ -134,6 +135,8 @@ export class PaymentsService {
     const updatedData: Partial<Payment> = {
       amount: updatePaymentDto.amount,
       date: updatePaymentDto.date,
+      status: updatePaymentDto.status,
+      
       reference: updatePaymentDto.reference,
     };
   
