@@ -33,9 +33,6 @@ import { BudgetsModule } from './budgets/budgets.module';
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: {
-        rejectUnauthorized: false,
-      }
     }),
     PaymentMethodsModule,
     DetailsModule,
