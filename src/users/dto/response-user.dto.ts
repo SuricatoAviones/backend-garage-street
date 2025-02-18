@@ -7,6 +7,8 @@ export class ResponseUserDto {
   password: string;
   email: string;
   phone: string;
+  address: string;
+  dni: string;
   rol: string;
   profilePicture: string;
   vehicle: Vehicle;
@@ -19,6 +21,8 @@ export class ResponseUserDto {
     this.password = user.password;
     this.email = user.email;
     this.phone = user.phone;
+    this.address = user.address;
+    this.dni = user.dni;
     this.rol = user.rol;
     this.profilePicture = user.profilePicture;
     this.vehicle = user.vehicles ? user.vehicles[0] : null; // Asume que solo hay un vehículo por usuario

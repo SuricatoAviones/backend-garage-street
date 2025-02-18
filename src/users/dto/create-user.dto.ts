@@ -34,4 +34,12 @@ export class CreateUserDto {
   @ApiProperty({ type: 'string', format: 'binary', required: false }) // Indica que es un archivo
   @IsOptional()
   profilePicture?: Multer.File; // Cambia el tipo a Express.Multer.File
+
+  @ApiProperty()
+  @IsString()
+  address: string; // Campo para la dirección
+
+  @ApiProperty()
+  @IsString()
+  dni: string;
 }

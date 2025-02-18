@@ -8,9 +8,9 @@ import { Payment } from 'src/payments/entities/payment.entity';
 import { CloudinaryModule } from 'src/common/services/cloudinary.module';
 import { Vehicle } from 'src/vehicles/entities/vehicle.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Appointment, Payment, Vehicle]),CloudinaryModule,],
+  imports: [TypeOrmModule.forFeature([User, Appointment, Payment, Vehicle]), CloudinaryModule,],
   controllers: [UsersController],
   providers: [UsersService],
-  exports: [UsersService],
+  exports: [UsersService, TypeOrmModule],
 })
 export class UsersModule {}

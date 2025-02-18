@@ -22,8 +22,8 @@ export class Vehicle {
     @OneToMany(() => Appointment, appointment => appointment.vehicle_id)
     appointments: Appointment[];
 
-    @ManyToOne(() => User, user => user.vehicles)
-    user_id: User;
+    @ManyToOne(() => User, user => user.vehicles, { eager: true }) // Nombre correcto: user
+    user: User; // Tipo: User (la entidad completa)
 
     @CreateDateColumn()
     created_at: Date;

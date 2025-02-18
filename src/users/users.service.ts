@@ -21,7 +21,7 @@ export class UsersService {
     private userRepository: Repository<User>,
     @InjectRepository(Vehicle)
     private vehicleRepository: Repository<Vehicle>,
-    private readonly cloudinaryService: CloudinaryService, // Inyecta el servicio de Cloudinary
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
@@ -29,53 +29,56 @@ export class UsersService {
       if (!Object.values(Roles).includes(createUserDto.rol as Roles)) {
         throw new BadRequestException('Rol no definido');
       }
-  
+
       let profilePictureUrl: string | undefined;
       if (createUserDto.profilePicture) {
         const uploadResult = await this.cloudinaryService.uploadImage(createUserDto.profilePicture);
         profilePictureUrl = uploadResult.secure_url;
       }
-  
+
       const user = this.userRepository.create({
         name: createUserDto.name,
         password: await bcryptjs.hash(createUserDto.password, 10),
         email: createUserDto.email,
         phone: createUserDto.phone,
+        address: createUserDto.address,
+        dni: createUserDto.dni,
         rol: createUserDto.rol,
         profilePicture: profilePictureUrl,
       });
-  
-      let savedUser = await this.userRepository.save(user);
-  
+
+      const savedUser = await this.userRepository.save(user);
+
       if (createUserDto.vehicle) {
-        const vehicle = await this.vehicleRepository.findOne({ 
-          where: { vehicle_id: createUserDto.vehicle } 
+        const vehicle = await this.vehicleRepository.findOne({
+          where: { vehicle_id: createUserDto.vehicle },
         });
         if (!vehicle) {
           throw new NotFoundException('Vehículo no encontrado');
         }
-        vehicle.user_id = savedUser;
+        vehicle.user = savedUser; // Asigna el usuario al vehículo
         await this.vehicleRepository.save(vehicle);
+
         // Recargar el usuario para traer las relaciones actualizadas
-        savedUser = await this.userRepository.findOne({
+        const userWithVehicles = await this.userRepository.findOne({
           where: { user_id: savedUser.user_id },
           relations: ['vehicles'],
         });
+
+        return new ResponseUserDto(userWithVehicles); // Devuelve el usuario con las relaciones
       }
-  
-      return new ResponseUserDto(savedUser);
+
+      return new ResponseUserDto(savedUser); // Si no hay vehículo, devuelve el usuario directamente
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
-  async update(
-    userId: number,
-    updateUserDto: UpdateUserDto,
-  ): Promise<ResponseUserDto> {
+  async update(userId: number, updateUserDto: UpdateUserDto): Promise<ResponseUserDto> {
     try {
       const user = await this.userRepository.findOne({
         where: { user_id: userId },
+        relations: ['vehicles'], // Carga la relación vehicles para poder modificarla
       });
 
       if (!user) {
@@ -104,23 +107,21 @@ export class UsersService {
 
       const updatedUser = await this.userRepository.save(user);
 
-      /* // Si se proporciona un vehículo, actualízalo o créalo
-      if (updateUserDto.vehicle) {
-        let vehicle = await this.vehicleRepository.findOne({
-          where: { user_id: userId },
-        });
-
-        if (vehicle) {
-          vehicle = Object.assign(vehicle, updateUserDto.vehicle);
+      // Si se proporciona un vehículo, actualízalo o créalo
+      if (updateUserDto.vehicle !== undefined) { // Verifica si se proporcionó el campo vehicle
+        if (updateUserDto.vehicle === null) {  // Desasociar el vehículo
+          user.vehicles = []; // Limpia la relación
         } else {
-          vehicle = this.vehicleRepository.create({
-            ...updateUserDto.vehicle,
-            user_id: updatedUser,
+          const vehicle = await this.vehicleRepository.findOne({
+            where: { vehicle_id: updateUserDto.vehicle },
           });
+          if (!vehicle) {
+            throw new NotFoundException('Vehículo no encontrado');
+          }
+          user.vehicles = [vehicle]; // Asigna el vehículo al usuario (usando un array)
         }
-
-        await this.vehicleRepository.save(vehicle);
-      } */
+        await this.userRepository.save(updatedUser); // Guarda los cambios con la relación actualizada
+      }
 
       return new ResponseUserDto(updatedUser);
     } catch (error) {

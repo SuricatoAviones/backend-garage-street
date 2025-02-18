@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -20,7 +19,7 @@ export class User {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @Column()
@@ -29,22 +28,25 @@ export class User {
   @Column()
   phone: string;
 
+  @Column({ nullable: true })
+  address: string;
+
+  @Column({ nullable: true })
+  dni: string;
+
   @Column({ default: Roles.Rol_Trabajador })
   rol: string;
 
   @Column({ nullable: true }) // Nuevo campo para la foto de perfil
   profilePicture: string;
 
-  @OneToMany(() => Vehicle, (vehicle) => vehicle.user_id)
-  @JoinColumn()
+  @OneToMany(() => Vehicle, (vehicle) => vehicle.user) // <-- CORRECCIÓN AQUÍ
   vehicles: Vehicle[];
 
   @OneToMany(() => Appointment, (appointment) => appointment.user_id)
-  @JoinColumn()
   appointments: Appointment[];
 
   @OneToMany(() => Payment, (payment) => payment.user_id)
-  @JoinColumn()
   payments: Payment[];
 
   @CreateDateColumn()
