@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, IsDate } from 'class-validator';
+import { IsNumber, IsString, IsDate, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
-
+import { Multer } from 'multer'; // Importa Express para manejar archivos
 export class CreatePaymentDto {
   @ApiProperty()
   @IsNumber()
@@ -19,6 +19,10 @@ export class CreatePaymentDto {
   @IsDate()
   @Type(() => Date)
   date: Date;
+
+   @ApiProperty({ type: 'string', format: 'binary', required: false }) // Indica que es un archivo
+    @IsOptional()
+    img?: Multer.File;
 
   @ApiProperty({ type: Number, description: 'ID of the user' })
   @IsNumber()
