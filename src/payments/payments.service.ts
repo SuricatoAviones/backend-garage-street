@@ -108,9 +108,13 @@ export class PaymentsService {
     if (!payment) {
       throw new NotFoundException(`Payment with ID ${payment_id} not found`);
     }
-
-    Object.assign(payment, updatePaymentDto);
-
+  
+    // Actualizar los campos simples del pago
+    payment.amount = updatePaymentDto.amount || payment.amount;
+    payment.date = updatePaymentDto.date || payment.date;
+    payment.reference = updatePaymentDto.reference || payment.reference;
+    payment.status = updatePaymentDto.status || payment.status; // Asegúrate de actualizar el campo status
+  
     if (updatePaymentDto.user_id) {
       const userId = this.parseField(updatePaymentDto.user_id);
       const user = await this.userRepository.findOne({ where: { user_id: userId } });
@@ -119,7 +123,7 @@ export class PaymentsService {
       }
       payment.user_id = user;
     }
-
+  
     if (updatePaymentDto.appointment_id) {
       const appointmentId = this.parseField(updatePaymentDto.appointment_id);
       const appointment = await this.appointmentRepository.findOne({ where: { appointment_id: appointmentId } });
@@ -128,7 +132,7 @@ export class PaymentsService {
       }
       payment.appointment_id = appointment;
     }
-
+  
     if (updatePaymentDto.payment_method_id) {
       const paymentMethodId = this.parseField(updatePaymentDto.payment_method_id);
       const paymentMethod = await this.paymentMethodRepository.findOne({ where: { payment_method_id: paymentMethodId } });
@@ -137,7 +141,7 @@ export class PaymentsService {
       }
       payment.payment_method_id = paymentMethod;
     }
-
+  
     try {
       const savedPayment = await this.paymentRepository.save(payment);
       this.notificationsGateway.sendNotification('PaymentUpdate', updatePaymentDto);
