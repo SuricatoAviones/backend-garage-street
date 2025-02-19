@@ -31,6 +31,8 @@ create(
     return this.appointmentsService.findOne(+id);
   }
 
+  @ApiConsumes('multipart/form-data')
+@UseInterceptors(FilesInterceptor('files'))
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAppointmentDto: UpdateAppointmentDto) {
     return this.appointmentsService.update(+id, updateAppointmentDto);
